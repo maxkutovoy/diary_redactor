@@ -16,9 +16,9 @@ def fix_marks(schoolkid):
                 bad_mark.save()
         else:
             print(f'Плохих оценок у ученика {kid} не найдено')
-    except ObjectDoesNotExist:
-        print('Ученик не найден')
-    except MultipleObjectsReturned:
+    except Schoolkid.ObjectDoesNotExist:
+        print('Ученик не найден, проверьте правильность запроса')
+    except Schoolkid.MultipleObjectsReturned:
         print('Слишком много вариантов, уточните запрос')
 
 
@@ -30,9 +30,9 @@ def remove_chastisements(schoolkid):
             chastisements.delete()
         else:
             print(f'Замечаний для ученика {kid} не найдено')
-    except ObjectDoesNotExist:
-        print('Ученик не найден')
-    except MultipleObjectsReturned:
+    except Schoolkid.ObjectDoesNotExist:
+        print('Ученик не найден, проверьте правильность запроса')
+    except Schoolkid.MultipleObjectsReturned:
         print('Слишком много вариантов, уточните запрос')
 
 
@@ -73,7 +73,7 @@ def create_commendation(schoolkid, subject):
         kid = Schoolkid.objects.get(full_name__contains=schoolkid)
         lessons = Lesson.objects.filter(year_of_study='6', group_letter='А', subject__title=subject).order_by('-date')
         if not lessons:
-            raise ObjectDoesNotExist
+            raise Lesson.ObjectDoesNotExist
         for lesson in lessons:
             commendation = Commendation.objects.filter(created=lesson.date, schoolkid=kid, subject=lesson.subject,
                                                        teacher=lesson.teacher)
@@ -82,7 +82,9 @@ def create_commendation(schoolkid, subject):
                 Commendation.objects.create(text=random_commendation, created=lesson.date, schoolkid=kid,
                                             subject=lesson.subject, teacher=lesson.teacher)
                 break
-    except ObjectDoesNotExist:
-        print('Ничего не найдено, проверьте правильность запроса')
-    except MultipleObjectsReturned:
+    except Schoolkid.ObjectDoesNotExist:
+        print('Ученик не найден, проверьте правильность запроса')
+    except Schoolkid.MultipleObjectsReturned:
         print('Слишком много вариантов, уточните запрос')
+    except Lesson.ObjectDoesNotExist:
+        print('Предмет не найден, проверьте правильность запроса')
