@@ -7,7 +7,6 @@ from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
 
 
 def fix_marks(schoolkid):
-    # Исправляем оценки
     try:
         kid = Schoolkid.objects.get(full_name__contains=schoolkid)
         marks = Mark.objects.filter(schoolkid=kid, points__lt=4)
@@ -24,7 +23,6 @@ def fix_marks(schoolkid):
 
 
 def remove_chastisements(schoolkid):
-    # Удаляем замечания от учителей
     try:
         kid = Schoolkid.objects.get(full_name__contains=schoolkid)
         chastisements = Chastisement.objects.filter(schoolkid=kid)
@@ -39,7 +37,6 @@ def remove_chastisements(schoolkid):
 
 
 def create_commendation(schoolkid, subject):
-    # Добавляем похвалу от учителя
     commendations = [
         'Молодец!',
         'Отлично!',
