@@ -10,37 +10,35 @@ from datacenter.models import (
 )
 
 
-def fix_marks(schoolkid):
+def find_schoolkid(schoolkid):
     try:
         kid = Schoolkid.objects.get(full_name__contains=schoolkid)
-        marks = Mark.objects.filter(schoolkid=kid, points__lt=4)
-        if marks:
-            for bad_mark in marks:
-                bad_mark.points = random.randint(4, 5)
-                bad_mark.save()
-        else:
-            print(f"Плохих оценок у ученика {kid} не найдено")
+        return kid
     except Schoolkid.ObjectDoesNotExist:
         print("Ученик не найден, проверьте правильность запроса")
     except Schoolkid.MultipleObjectsReturned:
         print("Слишком много вариантов, уточните запрос")
 
 
-def remove_chastisements(schoolkid):
-    try:
-        kid = Schoolkid.objects.get(full_name__contains=schoolkid)
-        chastisements = Chastisement.objects.filter(schoolkid=kid)
-        if chastisements:
-            chastisements.delete()
-        else:
-            print(f"Замечаний для ученика {kid} не найдено")
-    except Schoolkid.ObjectDoesNotExist:
-        print("Ученик не найден, проверьте правильность запроса")
-    except Schoolkid.MultipleObjectsReturned:
-        print("Слишком много вариантов, уточните запрос")
+def fix_marks(kid):
+    marks = Mark.objects.filter(schoolkid=kid, points__lt=4)
+    if marks:
+        for bad_mark in marks:
+            bad_mark.points = random.randint(4, 5)
+            bad_mark.save()
+    else:
+        print(f"Плохих оценок у ученика {kid} не найдено")
 
 
-def create_commendation(schoolkid, subject):
+def remove_chastisements(kid):
+    chastisements = Chastisement.objects.filter(schoolkid=kid)
+    if chastisements:
+        chastisements.delete()
+    else:
+        print(f"Замечаний для ученика {kid} не найдено")
+
+
+def create_commendation(kid, subject):
     commendations = [
         "Молодец!",
         "Отлично!",
@@ -74,7 +72,6 @@ def create_commendation(schoolkid, subject):
         "Теперь у тебя точно все получится!",
     ]
     try:
-        kid = Schoolkid.objects.get(full_name__contains=schoolkid)
         lessons = Lesson.objects.filter(
             year_of_study=kid.yeayear_of_study,
             group_letter=kid.group_letter,
@@ -99,9 +96,5 @@ def create_commendation(schoolkid, subject):
                     teacher=lesson.teacher,
                 )
                 break
-    except Schoolkid.ObjectDoesNotExist:
-        print("Ученик не найден, проверьте правильность запроса")
-    except Schoolkid.MultipleObjectsReturned:
-        print("Слишком много вариантов, уточните запрос")
     except Lesson.ObjectDoesNotExist:
         print("Предмет не найден, проверьте правильность запроса")
